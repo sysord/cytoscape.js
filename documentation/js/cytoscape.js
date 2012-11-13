@@ -1,4 +1,3 @@
-
 /* cytoscape.js */
 
 /**
@@ -7431,14 +7430,19 @@ var cytoscape;
 		var n;
 		
 		n = cy.container();
-		while (n != null) {
+//PP: DISABLED. Container offset is the only thing we need. 
+//Using a div in a form, original code compute div offset + form offset and return wronk offset.  
+//it fix the mouse projection offset problem for my use but may be it's not correct. (???) 
+//		while (n != null) {
 			if (typeof(n.offsetLeft) == "number") {
+				//console.log("MOUSE:" + mouseEvent.pageX + " " + mouseEvent.pageY);
+				//console.log('Process: ' + n.id + ' ' + n.offsetLeft + " , " + n.offsetTop);		
 				offsetLeft += n.offsetLeft - n.scrollLeft;
 				offsetTop += n.offsetTop - n.scrollTop;
 			}
-			
-			n = n.parentNode;
-		}
+//		n = n.parentNode;
+//		}
+
 		// console.log(offsetLeft, offsetTop);
 		
 		x = mouseEvent.pageX - offsetLeft;
@@ -9170,7 +9174,9 @@ var cytoscape;
 		document.addEventListener("keyup", this.keyUpHandler, false);
 	
 		this.bufferCanvases[0].addEventListener("mousedown", this.mouseDownHandler, false);
-		window.addEventListener("mouseup", this.mouseUpHandler, false);
+		//PP: set listener on the canvas not on the full windows for avoid deselect on button click 
+		//window.addEventListener("mouseup", this.mouseUpHandler, false);
+		this.bufferCanvases[0].addEventListener("mouseup", this.mouseUpHandler, false);
 	
 		window.addEventListener("mousemove", this.mouseMoveHandler, false);
 		this.bufferCanvases[0].addEventListener("mouseout", this.mouseOutHandler, false);
@@ -11609,7 +11615,7 @@ var cytoscape;
 			text = text.toUpperCase();
 		} else if (textTransform == "lowercase") {
 			text = text.toLowerCase();
-		}
+	}	
 		
 		// Calculate text draw position based on text alignment
 		
@@ -11628,6 +11634,9 @@ var cytoscape;
 			* element._private.style["opacity"].value) + ")";
 		
 		if (text != undefined) {
+			//PP get NaN and error with Firefox when node position are 0,0. but works fine with Chrome:
+			if isNaN(textX) textX = 0;
+			if isNaN(textY) textY = 0;
 			context.fillText("" + text, textX, textY);
 		}
 		
